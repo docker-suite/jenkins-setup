@@ -1,0 +1,26 @@
+pipeline {
+
+  agent {
+    docker {
+        image 'dsuite/maven:3.8-openjdk-8'
+        args '-v /home/jenkins/.m2:/root/.m2:z -u root'
+        reuseNode true
+    }
+  }
+
+  stages {
+    stage('Version') {
+      steps {
+        sh 'java -version'
+        sh 'mvn --version'
+        sh 'git --version'
+      }
+    }
+    stage('Dependencies') {
+      steps {
+        sh 'mvn dependency:get -Dartifact=org.apache.commons:commons-lang3:3.12.0:jar:sources'
+      }
+    }
+  }
+
+}

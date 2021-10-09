@@ -1,0 +1,50 @@
+version: "3.8"
+
+networks:
+  jenkins:
+    driver: bridge
+
+services:
+
+  # Jenkins master
+  jenkins_server:
+    build:
+      context: ./assets/jenkins
+    networks:
+      - jenkins
+    container_name: JenkinsServer
+    hostname: JenkinsServer
+    restart: always
+    environment:
+      # - DOCKER_HOST=tcp://docker:2376
+      # - DOCKER_CERT_PATH=/certs/client
+      # - DOCKER_TLS_VERIFY=1
+      - DOCKER_HOST=tcp://docker:2375
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+    volumes:
+      - ./tmp/jenkins-data:/var/jenkins_home:rw
+      - ./tmp/jenkins-docker-certs:/certs/client:ro
+
+  # Docker in docker
+  jenkins_docker:
+    image: dsuite/jenkins-docker
+    networks:
+      jenkins:
+        aliases:
+          - docker
+    container_name: JenkinsDocker
+    hostname: JenkinsDocker
+    privileged: true
+    environment:
+      # - DOCKER_TLS_CERTDIR=/certs
+      - DOCKER_TLS_CERTDIR
+    ports:
+      # - "2376:2376"
+      - "2375:2375"
+    volumes:
+      - ./tmp/.m2:/home/jenkins/.m2
+      - ./tmp/jenkins-agent:/home/jenkins/agent
+      - ./tmp/jenkins-data:/home/jenkins/home
+      - ./tmp/jenkins-docker-certs:/certs/client

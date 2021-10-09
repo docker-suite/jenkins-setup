@@ -1,0 +1,44 @@
+pipeline {
+
+    agent { label 'docker-agent' }
+
+    stages {
+
+        stage('Clean') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout') {
+            steps {
+                checkout([$class: 'GitSCM',
+                            branches: [[name: '*/master']],
+                            doGenerateSubmoduleConfigurations: false,
+                            extensions: [
+                                [$class: 'CloneOption', depth: 0, noTags: false, reference: '', shallow: true],
+                                [$class: 'CleanBeforeCheckout']
+                            ],
+                            submoduleCfg: [],
+                            userRemoteConfigs: [[url: 'https://github.com/docker-suite/alpine-base.git']]
+                ])
+            }
+        }
+
+        stage('alpine-base') {
+            steps {
+                script {
+                    sh 'make build'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh 'make remove'
+            }
+        }
+    }
+}

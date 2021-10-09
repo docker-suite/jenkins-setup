@@ -1,0 +1,44 @@
+pipeline {
+
+    agent { label 'docker-agent' }
+
+    stages {
+        stage('Get hostname') {
+            steps {
+                sh 'echo "Welcome to $HOSTNAME"'
+                sh 'echo "Welcome to $HOSTNAME" > hostname'
+            }
+        }
+        stage('Current folder') {
+            steps {
+                sh 'echo "Current folder is : $(pwd)"'
+                sh 'echo "$(pwd)" > pwd'
+            }
+        }
+        stage('Current user') {
+            steps {
+                sh 'echo "Current user is : $(id)"'
+                sh 'echo "$(id)" > id'
+            }
+        }
+        stage('Tools version') {
+            steps {
+                sh 'git --version'
+                sh 'java --version'
+                sh 'make --version'
+                sh 'docker --version'
+
+                sh 'echo "$(git --version)" > git-version'
+                sh 'echo "$(java --version)" > java-version'
+                sh 'echo "$(make --version)" > make-version'
+                sh 'echo "$(docker version)" > docker-version'
+            }
+        }
+        stage('Docker test') {
+            steps {
+                sh 'ls -la /run'
+                sh 'docker pull alpine'
+            }
+        }
+    }
+}

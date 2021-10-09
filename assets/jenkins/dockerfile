@@ -1,0 +1,3 @@
+FROM dsuite/jenkins
+
+COPY docker-cloud-configuration.groovy ${REF}/init.groovy.d/

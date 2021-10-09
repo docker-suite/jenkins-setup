@@ -1,0 +1,18 @@
+pipeline {
+
+  agent {
+    docker {
+        image 'dsuite/alpine-nodejs:16'
+        args '-u root'
+    }
+  }
+
+  stages {
+    stage('Version') {
+      steps {
+        sh 'node --version'
+      }
+    }
+  }
+
+}
